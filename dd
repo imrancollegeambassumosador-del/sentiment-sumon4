@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>File Sentiment Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 40px;
+    }
+    .box {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      background: #0078d4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005ea6;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #eef3f8;
+      border-radius: 8px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>File Sentiment Analyzer</h2>
+    <input type="file" id="fileInput" accept=".txt" />
+    <button onclick="uploadFile()">Analyze Sentiment</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      const resultDiv = document.getElementById("result");
+
+      if (!fileInput.files.length) {
+        alert("Please select a file first.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = "Analyzing...";
+
+      try {
+        const response = await fetch("/analyze", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        resultDiv.innerHTML = `
+          <strong>File:</strong> ${data.filename}<br>
+          <strong>Sentiment:</strong> ${data.sentiment}<br>
+          <strong>Score:</strong> ${data.score}
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = "Error analyzing file.";
+      }
+    }
+  </script>
+</body>
+</html>
